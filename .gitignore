@@ -2,3 +2,9 @@
 *.a
 .*.swp
 *.dSYM
+
+/kbm2
+/pgzf
+/wtdbg-cns
+/wtdbg2
+/wtpoa-cns

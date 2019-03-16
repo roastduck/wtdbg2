@@ -1,16 +1,24 @@
 VERSION=2.3
 
-CC  := gcc
+CC  := icc
 BIN := /usr/local/bin
 
 ifeq (0, ${MAKELEVEL})
 TIMESTAMP=$(shell date)
 endif
 
-ifeq (1, ${DEBUG})
-CFLAGS=-g3 -W -Wall -Wno-unused-but-set-variable -O0 -DDEBUG=1 -DTIMESTAMP="$(TIMESTAMP)" -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -mpopcnt -msse4.2
+ifeq (icc, ${CC})
+	OPT_FLAGS = -O3 -xHost
+else ifeq (gcc, ${CC})
+	OPT_FLAGS = -O4 -march=native
 else
-CFLAGS=-g3 -W -Wall -Wno-unused-but-set-variable -O4 -DTIMESTAMP="$(TIMESTAMP)" -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -mpopcnt -msse4.2
+	$(error Unrecognized CC)
+endif
+
+ifeq (1, ${DEBUG})
+CFLAGS=-g3 -W -Wall -Wno-unused-but-set-variable -O0 -DDEBUG=1 -DTIMESTAMP="$(TIMESTAMP)" -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE
+else
+CFLAGS=-g3 -W -Wall -Wno-unused-but-set-variable ${OPT_FLAGS} -DTIMESTAMP="$(TIMESTAMP)" -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE
 endif
 
 GLIBS=-lm -lrt -lpthread -lz
