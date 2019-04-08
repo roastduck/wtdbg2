@@ -1923,14 +1923,20 @@ static inline void map_kbm(KBMAux *aux){
 				idx = heap->buffer[i];
 				ref = ref_kbmrefv(aux->refs, idx);
 				while(1){
-					saux = ref_kbmbauxv(kbm->sauxs, ref->boff);
+					ref->boff ++;
+					u8i boff = ref->boff;
+					KBM *kbm = aux->kbm;
+					u1i *sauxsBidx = &(kbm->sauxs->buffer[boff].bidx);
+					u4i *seedsBidx = &(kbm->seeds->buffer[boff].bidx);
+					__builtin_prefetch(sauxsBidx, 0);
+					__builtin_prefetch(seedsBidx, 0);
+					saux = ref_kbmbauxv(kbm->sauxs, boff - 1);
 					pdir = (ref->dir ^ saux->dir);
 					if(((aux->par->strand_mask >> pdir) & 0x01)){
 						push_kbmdpev(aux->caches[pdir], (kbm_dpe_t){ref->poffs[pdir], idx, ref->bidx, saux->koff});
 					}
-					ref->boff ++;
-					ref->bidx = getval_bidx(aux->kbm, ref->boff);
-					if(ref->boff >= ref->bend) break;
+					ref->bidx = ((((u8i)*sauxsBidx) << 32) | *seedsBidx);
+					if(boff >= ref->bend) break;
 #if __DEBUG__
 						if(ref->bidx < getval_bidx(aux->kbm, ref->boff - 1)){
 							fprintf(stderr, " -- something wrong in %s -- %s:%d --\n", __FUNCTION__, __FILE__, __LINE__); fflush(stderr);
