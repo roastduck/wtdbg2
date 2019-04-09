@@ -116,12 +116,12 @@ do {	\
 		x --; s = stack[x][0]; e = stack[x][1];	\
 		m = s + (e - s) / 2;	\
 		a = _rs[s]; b = _rs[m];	\
-		if(is_a_greater_than_b){ t = _rs[s]; _rs[s] = _rs[m]; _rs[m] = t; }	\
+		if(is_a_greater_than_b){ _rs[s] = b; _rs[m] = a; }	\
 		a = _rs[m]; b = _rs[e];	\
 		if(is_a_greater_than_b){	\
-			t = _rs[e]; _rs[e] = _rs[m]; _rs[m] = t;	\
+			_rs[e] = a; _rs[m] = b;	\
 			a = _rs[s]; b = _rs[m];	\
-			if(is_a_greater_than_b){ t = _rs[s]; _rs[s] = _rs[m]; _rs[m] = t; }	\
+			if(is_a_greater_than_b){ _rs[s] = b; _rs[m] = a; }	\
 		}	\
 		p = _rs[m];	\
 		i = s + 1; j = e - 1;	\
@@ -148,7 +148,7 @@ do {	\
 		x = 0;	\
 		for(j=_qsort_n-1;j>i;j--){	\
 			a = _rs[j - 1]; b = _rs[j];	\
-			if(is_a_greater_than_b){ t = _rs[j - 1]; _rs[j - 1] = _rs[j]; _rs[j] = t; x = 1; }	\
+			if(is_a_greater_than_b){ _rs[j - 1] = b; _rs[j] = a; x = 1; }	\
 		}	\
 		if(x == 0) break;	\
 	}	\
