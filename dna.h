@@ -79,8 +79,12 @@ static const char bit_base_table[12] = "ACGTN-acgtn*";
 static const char bit4_base_table[16] = "-ACMGRSVTWYHKDBN";
 
 // u8i = 0|1|2|3|4|5|6|...
-#define bits2bit(bits, off) (((bits)[(off) >> 5] >> (((~(off)) & 0x1FU) << 1)) & 0x03U)
-#define bits2revbit(bits, off) ((~((bits)[(off) >> 5] >> (((~(off)) & 0x1FU) << 1))) & 0x03U)
+static inline u8i bits2bit(u8i *bits, u8i off) {
+	return (bits[off >> 5] >> (((~off) & 0x1FU) << 1)) & 0x03U;
+}
+static inline u8i bits2revbit(u8i *bits, u8i off) {
+	return (~(bits[off >> 5] >> (((~off) & 0x1FU) << 1))) & 0x03U;
+}
 
 static inline u8i dna_xor2ones(u8i seq){
 	return ((seq & 0xAAAAAAAAAAAAAAAALLU) >> 1) | (seq & 0x5555555555555555LLU);
@@ -781,15 +785,14 @@ static inline void reverse_basebank(BaseBank *bnk){
 static inline void print_seq_basebank(BaseBank *bnk, u8i off, u8i len, FILE *out){
 	u8i i, b, e;
 	char buf[2049];
-	for(b=off;b<off+len;){
-		e = num_min(b + 2048, off + len);
-		for(i=b;i<e;i++){
-			buf[i - b] = bit_base_table[bits2bit(bnk->bits, i)];
+	for(b=0;b<len;b+=e){
+		e = num_min(2048, len - b);
+#pragma vector always
+		for(i=0;i<e;i++){
+			buf[i] = bit_base_table[bits2bit(bnk->bits, off + i)];
 		}
-		buf[e - b] = '\0';
+		buf[e] = '\0';
 		fputs(buf, out);
-		//fputc('\n', out);
-		b = e;
 	}
 }
 
@@ -821,18 +824,15 @@ static inline void println_seq_basebank(BaseBank *bnk, u8i off, u8i len, FILE *o
 #define println_fwdseq_basebank(bnk, off, len, out) println_seq_basebank(bnk, off, len, out)
 
 static inline void print_revseq_basebank(BaseBank *bnk, u8i off, u8i len, FILE *out){
-	u8i i;
+	u8i i, b, e;
 	char buf[2049];
-	buf[2048] = '\0';
-	for(i=0;i<len;){
-		buf[i & 2047] = bit_base_table[bits2revbit(bnk->bits, off + len - 1 - i)];
-		i ++;
-		if((i & 2047) == 0){
-			fputs(buf, out);
+	for(b=0;b<len;b+=e){
+		e = num_min(2048, len - b);
+#pragma vector always
+		for(i=0;i<e;i++){
+			buf[i] = bit_base_table[bits2revbit(bnk->bits, off + len - 1 - (b + i))];
 		}
-	}
-	if(i & 2047){
-		buf[i & 2047] = '\0';
+		buf[e] = '\0';
 		fputs(buf, out);
 	}
 }
