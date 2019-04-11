@@ -780,9 +780,9 @@ static inline void reverse_basebank(BaseBank *bnk){
 
 static inline void print_seq_basebank(BaseBank *bnk, u8i off, u8i len, FILE *out){
 	u8i i, b, e;
-	char buf[101];
+	char buf[2049];
 	for(b=off;b<off+len;){
-		e = num_min(b + 100, off + len);
+		e = num_min(b + 2048, off + len);
 		for(i=b;i<e;i++){
 			buf[i - b] = bit_base_table[bits2bit(bnk->bits, i)];
 		}
@@ -822,18 +822,18 @@ static inline void println_seq_basebank(BaseBank *bnk, u8i off, u8i len, FILE *o
 
 static inline void print_revseq_basebank(BaseBank *bnk, u8i off, u8i len, FILE *out){
 	u8i i;
-	char buf[65];
-	buf[64] = '\0';
+	char buf[2049];
+	buf[2048] = '\0';
 	for(i=0;i<len;){
-		buf[i & 0x3F] = bit_base_table[bits2revbit(bnk->bits, off + len - 1 - i)];
+		buf[i & 2047] = bit_base_table[bits2revbit(bnk->bits, off + len - 1 - i)];
 		i ++;
-		if((i & 0x3F) == 0){
-			fprintf(out, "%s", buf);
+		if((i & 2047) == 0){
+			fputs(buf, out);
 		}
 	}
-	if(i & 0x3F){
-		buf[i & 0x3F] = '\0';
-		fprintf(out, "%s", buf);
+	if(i & 2047){
+		buf[i & 2047] = '\0';
+		fputs(buf, out);
 	}
 }
 
