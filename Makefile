@@ -16,9 +16,9 @@ else
 endif
 
 ifeq (1, ${DEBUG})
-CFLAGS=-g3 -W -Wall -Wno-unused-but-set-variable -O0 -DDEBUG=1 -DTIMESTAMP="$(TIMESTAMP)" -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE
+CFLAGS=-g3 -W -Wall -Wno-unused-but-set-variable -O0 -DDEBUG=1 -DTIMESTAMP="$(TIMESTAMP)" -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -fopenmp
 else
-CFLAGS=-g3 -W -Wall -Wno-unused-but-set-variable ${OPT_FLAGS} -DTIMESTAMP="$(TIMESTAMP)" -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE
+CFLAGS=-g3 -W -Wall -Wno-unused-but-set-variable ${OPT_FLAGS} -DTIMESTAMP="$(TIMESTAMP)" -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -fopenmp
 endif
 
 GLIBS=-lm -lrt -lpthread -lz

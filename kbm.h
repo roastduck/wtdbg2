@@ -996,13 +996,8 @@ static inline void index_kbm(KBM *kbm, u8i beg, u8i end, u4i ncpu, FILE *kmstat)
 	// delete low freq kmer from hash
 	thread_apply_all(midx, midx->task = 2);
 	// freeze hash to save memory and speed up the query
+#pragma omp parallel for
 	for(i=0;i<KBM_N_HASH;i++){
-		if(0){
-			fprintf(KBM_LOGF, "%12llu ", (u8i)kbm->hashs[i]->count); fflush(KBM_LOGF);
-			if((i % 8) == 7){
-				fprintf(KBM_LOGF, "\n"); fflush(KBM_LOGF);
-			}
-		}
 		freeze_kbmhash(kbm->hashs[i], 1.0 / 16);
 		free_kbmkauxv(kbm->kauxs[i]);
 		kbm->kauxs[i] = init_kbmkauxv(kbm->hashs[i]->count);
