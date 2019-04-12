@@ -229,7 +229,7 @@ typedef struct {
 #endif
 	u4i poff;
 	u4i refidx;
-	u8i bidx:40, koff:24;
+	u8i bidx, koff; // ICC can't vectorize if there are bit fields
 } kbm_dpe_t;
 define_list(kbmdpev, kbm_dpe_t);
 
