@@ -340,11 +340,11 @@ static inline void free_graph(Graph *g){
 	free(g);
 }
 
-static inline int map2rdhits_graph(Graph *g, kbm_map_t *hit){
+static inline void map2rdhits_graph(Graph *g, kbm_map_t *hit){
 	u4i k, f, d, p, n, add;
 	rd_hit_t *rh, *hp, *hn;
 	read_t *rd;
-	if(hit->mat == 0) return 0;
+	if(hit->mat == 0) return;
 	rh = next_ref_rdhitv(g->rdhits);
 	rh->frgs[0] = (rd_frg_t){hit->qidx, hit->qdir, hit->qb, hit->qe, 0};
 	rh->frgs[1] = (rd_frg_t){hit->tidx, hit->tdir, hit->tb, hit->te, 0};
@@ -411,7 +411,6 @@ static inline int map2rdhits_graph(Graph *g, kbm_map_t *hit){
 		trunc_rdhitv(g->rdhits, 1);
 		g->cigars->size -= hit->cglen;
 	}
-	return add;
 }
 
 static inline int is_dovetail_overlap(Graph *g, kbm_map_t *hit){
