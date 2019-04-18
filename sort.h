@@ -116,12 +116,12 @@ do {	\
 		x --; s = stack[x][0]; e = stack[x][1];	\
 		m = s + (e - s) / 2;	\
 		a = _rs[s]; b = _rs[m];	\
-		if(is_a_greater_than_b){ t = _rs[s]; _rs[s] = _rs[m]; _rs[m] = t; }	\
+		if(is_a_greater_than_b){ _rs[s] = b; _rs[m] = a; }	\
 		a = _rs[m]; b = _rs[e];	\
 		if(is_a_greater_than_b){	\
-			t = _rs[e]; _rs[e] = _rs[m]; _rs[m] = t;	\
+			_rs[e] = a; _rs[m] = b;	\
 			a = _rs[s]; b = _rs[m];	\
-			if(is_a_greater_than_b){ t = _rs[s]; _rs[s] = _rs[m]; _rs[m] = t; }	\
+			if(is_a_greater_than_b){ _rs[s] = b; _rs[m] = a; }	\
 		}	\
 		p = _rs[m];	\
 		i = s + 1; j = e - 1;	\
@@ -144,14 +144,21 @@ do {	\
 			if(s + 4 < j){ stack[x][0] = s; stack[x][1] = j; x ++; }	\
 		}	\
 	}	\
-	for(i=0;i<_qsort_n;i++){	\
+	do {	\
 		x = 0;	\
-		for(j=_qsort_n-1;j>i;j--){	\
-			a = _rs[j - 1]; b = _rs[j];	\
-			if(is_a_greater_than_b){ t = _rs[j - 1]; _rs[j - 1] = _rs[j]; _rs[j] = t; x = 1; }	\
-		}	\
-		if(x == 0) break;	\
-	}	\
+		_Pragma("vector always") \
+		for (j = 0; j < _qsort_n - 1; j += 2) { \
+			e_type a = _rs[j], b = _rs[j + 1]; /* Use local a and b to support vectorization, same below */ \
+			if (is_a_greater_than_b) \
+				_rs[j] = b, _rs[j + 1] = a, x = 1; \
+		} \
+		_Pragma("vector always") \
+		for (j = 1; j < _qsort_n - 1; j += 2) { \
+			e_type a = _rs[j], b = _rs[j + 1]; \
+			if (is_a_greater_than_b) \
+				_rs[j] = b, _rs[j + 1] = a, x = 1; \
+		} \
+	} while (x); \
 } while(0)
 
 #define sort_array_adv(rs_size, is_a_greater_than_b, swap_expr)	\

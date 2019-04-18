@@ -1570,11 +1570,10 @@ static inline u4i realign_msa_pog_core(POG *g, u4i ridx, int W){
 			for(j=beg;j<end;j++){
 				e = row1[j + 1];
 				//h = row1[j] + (s[i] == bcnts[5][off + j]? bcnts[s[i]][off + j] : 0);
-				if(Int(bcnts[s[i]][off + j] + 1) >= Int(bcnts[6][off + j] - bcnts[s[i]][off + j])){
-					h = row1[j] + 2 * bcnts[s[i]][off + j] - bcnts[6][off + j] + 1;
-				} else {
-					h = row1[j] + 1;
-				}
+				h = row1[j] + 1;
+				int tmp = 2 * (int)bcnts[s[i]][off + j] - (int)bcnts[6][off + j];
+				if (tmp >= -1)
+					h += tmp;
 				// bonus for putting homo together
 				if(i && bs1[j] == 0 && s[i] == s[i - 1]){
 					h += 1;
